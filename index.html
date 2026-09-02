@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Roadmap — SDC × GDG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0c14;
+    --panel:#131722;
+    --panel-raised:#181d2b;
+    --ink:#e9ecf3;
+    --ink-muted:#8890a4;
+    --ink-faint:#565d70;
+    --line:#262b3b;
+
+    --amber:#d3a44b;
+    --sage:#8ead94;
+    --blue:#7793b0;
+    --plum:#a281ac;
+    --rust:#bd7250;
+
+    --serif:'Fraunces', serif;
+    --mono:'JetBrains Mono', monospace;
+
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--void);
+    color:var(--ink);
+    font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---------- starfield ---------- */
+  #stars{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+  .star{position:absolute; background:#fff; border-radius:50%; animation:twinkle var(--dur,4s) ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:var(--minop,.15);} 50%{opacity:var(--maxop,.9);}}
+
+  body::after{
+    content:"";
+    position:fixed; inset:0;
+    background:radial-gradient(ellipse 80% 55% at 50% 0%, rgba(119,147,176,.10), transparent 62%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  a,button{font-family:inherit;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:6;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,5vw,56px);
+    font-size:.72rem;
+    letter-spacing:.02em;
+    color:var(--ink-muted);
+    background:linear-gradient(var(--void) 70%, transparent);
+  }
+  .wordmark{display:flex; align-items:center; gap:8px;}
+  .wordmark::before{
+    content:"";
+    width:6px; height:6px;
+    background:var(--amber);
+    display:inline-block;
+    border-radius:1px;
+  }
+  .stepcount{
+    font-variant-numeric:tabular-nums;
+    color:var(--ink-muted);
+    opacity:0;
+    transition:opacity .3s var(--ease);
+  }
+  .stepcount.visible{opacity:1;}
+  .stepcount b{color:var(--ink); font-weight:600;}
+
+  /* ---------- screens ---------- */
+  #app{
+    position:relative; z-index:2;
+    min-height:calc(100vh - 70px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px clamp(16px,5vw,56px) 50px;
+  }
+  .screen{
+    display:none;
+    width:100%;
+    max-width:1080px;
+  }
+  .screen.active{display:block;}
+
+  /* ---------- intro ---------- */
+  #screen-intro{text-align:center; max-width:780px; margin:0 auto;}
+  .kicker{
+    font-size:.78rem;
+    color:var(--ink-muted);
+    margin:0 0 22px;
+  }
+  .hero-title{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(2.4rem, 6vw, 4.2rem);
+    line-height:1.08;
+    letter-spacing:-.01em;
+    margin:0 0 22px;
+  }
+  .hero-sub{
+    color:var(--amber);
+    font-size:.95rem;
+    margin:0 0 40px;
+  }
+
+  .btn-primary{
+    appearance:none;
+    border:1px solid var(--amber);
+    background:var(--amber);
+    color:#191410;
+    font-family:var(--mono);
+    font-weight:600;
+    font-size:.95rem;
+    padding:15px 30px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:transform .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 24px -12px rgba(211,164,75,.5);}
+  .btn-primary:active{transform:translateY(0px) scale(.98);}
+  .btn-primary:disabled{opacity:.35; cursor:not-allowed; transform:none; box-shadow:none;}
+
+  .btn-ghost{
+    appearance:none;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    font-family:var(--mono);
+    font-weight:500;
+    font-size:.9rem;
+    padding:14px 26px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:transform .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease);
+  }
+  .btn-ghost:hover{border-color:var(--ink-muted); transform:translateY(-2px);}
+  .btn-ghost:disabled{opacity:.3; cursor:not-allowed; transform:none;}
+
+  .hero-hint{
+    margin-top:26px;
+    font-size:.74rem;
+    color:var(--ink-faint);
+  }
+
+  /* ---------- journey progress bar ---------- */
+  .progress-bar{
+    position:relative;
+    height:2px;
+    background:var(--line);
+    margin:0 auto 6px;
+    max-width:900px;
+    border-radius:1px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    position:absolute; top:0; left:0; bottom:0;
+    width:0%;
+    background:var(--amber);
+    transition:width .5s var(--ease);
+  }
+  .page-indicator{
+    text-align:center;
+    font-size:.72rem;
+    color:var(--ink-faint);
+    margin:0 0 8px;
+  }
+  .page-indicator b{color:var(--ink-muted); font-weight:600;}
+
+  /* ---------- constellation ---------- */
+  .constellation-wrap{
+    position:relative;
+    max-width:900px;
+    margin:0 auto;
+    transition:opacity .35s var(--ease), transform .35s var(--ease);
+  }
+  .constellation-wrap.turning{opacity:0; transform:translateX(18px);}
+  svg#pathSvg{width:100%; height:auto; display:block; overflow:visible;}
+
+  .seg{fill:none; stroke:var(--line); stroke-width:1.5; stroke-dasharray:2 7; stroke-linecap:round;}
+  .seg.lit{stroke:var(--amber); opacity:.55; transition:stroke .5s var(--ease), opacity .5s var(--ease);}
+
+  .node-dot{transition:r .4s var(--ease), opacity .4s var(--ease);}
+  .node-dot.pending{opacity:.28;}
+  .node-dot.active{filter:drop-shadow(0 0 10px var(--glow, var(--amber)));}
+
+  .node-label{
+    opacity:0;
+    transition:opacity .35s var(--ease) .1s;
+  }
+  .node-label.shown{opacity:1;}
+  .node-label text{
+    font-family:var(--mono);
+    font-weight:600;
+    font-size:13px;
+    fill:var(--ink);
+  }
+  .node-label .num{fill:var(--ink-faint); font-size:10.5px; font-weight:500;}
+  .node-stem{stroke:var(--line); stroke-width:1;}
+
+  .comet{opacity:0;}
+  .comet.flying{opacity:1;}
+
+  .rocket-glyph{
+    font-size:22px;
+    opacity:0;
+    transition:opacity .3s var(--ease);
+  }
+  .rocket-glyph.shown{opacity:1;}
+
+  /* ---------- detail card ---------- */
+  .detail-wrap{
+    max-width:640px;
+    margin:18px auto 0;
+    min-height:190px;
+  }
+  .entry-card{
+    border:1px solid var(--line); border-radius:4px;
+    background:var(--panel-raised);
+    padding:clamp(18px,3vw,26px);
+    text-align:left;
+  }
+  .card-inner{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .card-inner.entering{animation:entryRise .45s var(--ease);}
+  @keyframes entryRise{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .glyph{
+    width:52px; height:52px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--panel);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono);
+    font-weight:600;
+    font-size:.7rem;
+    text-align:center;
+    color:var(--cat-color, var(--amber));
+    flex-shrink:0;
+  }
+
+  .card-index{font-size:.74rem; color:var(--ink-muted); margin:0 0 6px;}
+  .card-title{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(1.3rem,2.6vw,1.65rem);
+    line-height:1.15;
+    margin:0 0 8px;
+    letter-spacing:-.005em;
+  }
+  .card-tagline{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:.92rem;
+    color:var(--ink);
+    opacity:.85;
+    margin:0;
+  }
+
+  .meta-row{display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+  .level{display:flex; align-items:center; gap:8px; font-size:.73rem; color:var(--ink-muted);}
+  .level-cells{display:flex; gap:3px;}
+  .level-cell{width:8px; height:8px; border:1px solid var(--line); border-radius:1px;}
+  .level-cell.filled{background:var(--cat-color, var(--amber)); border-color:var(--cat-color, var(--amber));}
+
+  .category-tag{display:flex; align-items:center; gap:7px; font-size:.73rem; color:var(--ink-muted);}
+  .category-tag .swatch{width:8px; height:8px; border-radius:1px; background:var(--cat-color, var(--amber));}
+
+  .why-box{border-left:2px solid var(--cat-color, var(--amber)); padding-left:14px;}
+  .why-label{font-size:.7rem; color:var(--ink-muted); margin:0 0 5px;}
+  .why-text{font-size:.87rem; line-height:1.55; color:var(--ink); margin:0;}
+
+  /* ---------- nav ---------- */
+  .nav-row{
+    display:flex; justify-content:center; align-items:center;
+    margin:22px auto 0; gap:14px;
+    max-width:640px;
+  }
+  .nav-row .btn-ghost, .nav-row .btn-primary{flex:0 0 auto;}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed; left:20px; bottom:20px; z-index:9;
+    background:var(--panel-raised);
+    border:1px solid var(--line); border-left:2px solid var(--amber);
+    padding:11px 16px; font-size:.8rem; color:var(--ink);
+    border-radius:3px;
+    transform:translateY(140%); opacity:0;
+    transition:transform .38s var(--ease), opacity .38s var(--ease);
+    max-width:min(340px, calc(100vw - 40px));
+  }
+  .toast.show{transform:translateY(0); opacity:1;}
+  .toast::before{content:"> "; color:var(--ink-muted);}
+  .toast::after{
+    content:""; display:inline-block; width:6px; height:11px; margin-left:5px;
+    background:var(--amber); vertical-align:middle;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  /* ---------- complete screen ---------- */
+  #screen-complete{text-align:center; max-width:900px; margin:0 auto;}
+  .overview-grid{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:clamp(16px,3vw,28px); text-align:left; margin:44px 0 46px;
+  }
+  .overview-col{border-top:1px solid var(--line); padding-top:14px;}
+  .overview-col-head{display:flex; align-items:center; gap:7px; font-size:.76rem; color:var(--ink-muted); margin-bottom:12px;}
+  .overview-col-head .swatch{width:8px; height:8px; border-radius:1px;}
+  .overview-col ul{list-style:none; margin:0; padding:0;}
+  .overview-col li{
+    font-size:.82rem; color:var(--ink); padding:6px 0;
+    border-bottom:1px dashed var(--line);
+    opacity:0; transform:translateY(6px);
+    animation:riseIn .5s var(--ease) forwards;
+  }
+  .overview-col li:last-child{border-bottom:none;}
+  @keyframes riseIn{to{opacity:1; transform:translateY(0);}}
+
+  .closing-line{
+    font-family:var(--serif); font-style:italic; font-size:1.15rem;
+    color:var(--ink); opacity:.9; margin:0 0 40px;
+  }
+
+  button:focus-visible{outline:1px solid var(--amber); outline-offset:3px;}
+
+  @media (max-width:760px){
+    .overview-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:600px){
+    .node-label text{font-size:11.5px;}
+    .stepcount{font-size:.68rem;}
+    .glyph{width:42px; height:42px; font-size:.62rem;}
+  }
+  @media (max-width:420px){
+    .overview-grid{grid-template-columns:1fr 1fr; gap:14px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<header class="topbar">
+  <span class="wordmark">SDC × GDG — DSA Roadmap</span>
+  <span class="stepcount" id="stepCount"></span>
+</header>
+
+<main id="app">
+
+  <!-- INTRO -->
+  <section id="screen-intro" class="screen active">
+    <p class="kicker">A live session by SDC &amp; GDG</p>
+    <h1 class="hero-title">Your DSA journey<br>starts here 🚀</h1>
+    <p class="hero-sub">$ ./start_journey.sh</p>
+    <button id="btnStart" class="btn-primary">Start Journey →</button>
+    <p class="hero-hint">15 stages across 3 legs of the journey — one stage lights up at a time</p>
+  </section>
+
+  <!-- JOURNEY -->
+  <section id="screen-journey" class="screen">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="page-indicator">Leg <b id="pageNum">1</b> of <b id="pageTotal">3</b></p>
+
+    <div class="constellation-wrap" id="constWrap">
+      <svg id="pathSvg" viewBox="0 0 1160 380" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <div class="detail-wrap" id="detailWrap"></div>
+
+    <div class="nav-row">
+      <button id="btnPrev" class="btn-ghost">← Previous</button>
+      <button id="btnNext" class="btn-primary">Next →</button>
+    </div>
+  </section>
+
+  <!-- COMPLETE -->
+  <section id="screen-complete" class="screen">
+    <p class="kicker">Session complete</p>
+    <h1 class="hero-title">You made it 🎯</h1>
+    <p class="hero-sub">Basics → Core DSA → Advanced Structures → Problem Solving</p>
+    <div class="overview-grid" id="overviewGrid"></div>
+    <p class="closing-line">One language. One roadmap. One problem at a time.</p>
+    <button id="btnRestart" class="btn-ghost">Restart Journey ↺</button>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+
+  const topics = [
+    {id:1, category:'basics', icon:'{ }', name:'Programming Basics', tagline:'Where every line of logic begins.', level:1,
+      why:"Before you can solve problems, you need a language to think in."},
+    {id:2, category:'basics', icon:'O(n)', name:'Time & Space Complexity', tagline:'The lens that separates a solution from a good solution.', level:1,
+      why:"Two answers can both work — this tells you which one survives at scale."},
+    {id:3, category:'core', icon:'[0,1,2]', name:'Arrays', tagline:'Your first real weapon in problem solving.', level:1,
+      why:"Almost every data structure you'll learn next is arrays wearing a costume.",
+      fun:"Okay, arrays survived 😎"},
+    {id:4, category:'core', icon:'"str"', name:'Strings', tagline:'Arrays that learned to speak.', level:1,
+      why:"A large share of interview questions are just arrays with quotation marks."},
+    {id:5, category:'core', icon:'⇅', name:'Searching & Sorting', tagline:'Order is the first superpower you unlock.', level:2,
+      why:"A sorted array quietly turns hard problems into easy two-pointer ones."},
+    {id:6, category:'core', icon:'f(f(x))', name:'Recursion', tagline:'Teaching a function to trust itself.', level:2,
+      why:"Trees, backtracking and DP all speak recursion as a native language.",
+      fun:"Recursion has entered the chat."},
+    {id:7, category:'core', icon:'●→●→●', name:'Linked List', tagline:'Memory without the comfort of neighbours.', level:2,
+      why:"It trains you to think in pointers, not positions."},
+    {id:8, category:'core', icon:'▮ ▮ ▮', name:'Stack & Queue', tagline:'Order of operations, made physical.', level:2,
+      why:"Undo buttons, browser history and BFS are quietly this."},
+    {id:9, category:'core', icon:'#', name:'Hashing', tagline:'Trading a little memory for a lot of speed.', level:2,
+      why:"Often the exact difference between an O(n²) and an O(n) solution."},
+    {id:10, category:'advanced', icon:'▲', name:'Trees & BST', tagline:'Hierarchy finally gets a shape.', level:2,
+      why:"File systems, decisions and search all branch exactly like this."},
+    {id:11, category:'advanced', icon:'▲min', name:'Heap / Priority Queue', tagline:'Always know what matters most, instantly.', level:3,
+      why:"For when a fully sorted list is overkill and you only need the top one."},
+    {id:12, category:'advanced', icon:'●─●─●', name:'Graphs', tagline:'Everything is connected. Literally.', level:3,
+      why:"Maps, networks and friendships — graphs are just the real world in code.",
+      fun:"Graphs look scary. They're not."},
+    {id:13, category:'problem', icon:'argmax', name:'Greedy', tagline:'Take the best option now, hope it holds up.', level:3,
+      why:"Sometimes the locally obvious choice really is the globally correct one."},
+    {id:14, category:'problem', icon:'try/undo', name:'Backtracking', tagline:'Try, fail, undo, try again — on purpose.', level:3,
+      why:"It's recursion with the courage to walk back its own mistakes.",
+      fun:"Trial, error, repeat. Very on brand."},
+    {id:15, category:'problem', icon:'memo[]', name:'Dynamic Programming', tagline:'Recursion that remembers.', level:3,
+      why:"The final boss is just recursion refusing to repeat its own work.",
+      fun:"DP boss fight unlocked 💀"}
+  ];
+
+  const CAT = {
+    basics:  {label:'Basics',              color:'var(--sage)',  hex:'#8ead94'},
+    core:    {label:'Core DSA',            color:'var(--rust)',  hex:'#bd7250'},
+    advanced:{label:'Advanced Structures', color:'var(--blue)',  hex:'#7793b0'},
+    problem: {label:'Problem Solving',     color:'var(--plum)',  hex:'#a281ac'}
+  };
+  const LEVEL_LABEL = {1:'Beginner', 2:'Intermediate', 3:'Advanced'};
+
+  // split the 15 stages into 3 legs of 5
+  const PAGES = [topics.slice(0,5), topics.slice(5,10), topics.slice(10,15)];
+  const total = topics.length;
+
+  // zigzag layout for 5 nodes per leg (ascending journey, like a constellation path)
+  const POS = [
+    {x:70,  y:300}, {x:330, y:200}, {x:590, y:270}, {x:850, y:150}, {x:1090, y:210}
+  ];
+
+  let pageIndex = 0;
+  let revealUpTo = 0; // index within current page, last revealed node
+  let started = false;
+
+  const screens = {
+    intro: document.getElementById('screen-intro'),
+    journey: document.getElementById('screen-journey'),
+    complete: document.getElementById('screen-complete')
+  };
+  const stepCount = document.getElementById('stepCount');
+  const svg = document.getElementById('pathSvg');
+  const constWrap = document.getElementById('constWrap');
+  const progressFill = document.getElementById('progressFill');
+  const pageNumEl = document.getElementById('pageNum');
+  const detailWrap = document.getElementById('detailWrap');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnStart = document.getElementById('btnStart');
+  const btnRestart = document.getElementById('btnRestart');
+  const toast = document.getElementById('toast');
+  const overviewGrid = document.getElementById('overviewGrid');
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    const n = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  function showScreen(name){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  function makeStarfield(){
+    const wrap = document.getElementById('stars');
+    const n = 55;
+    for (let i=0;i<n;i++){
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random()*1.6 + 0.6;
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = (Math.random()*100)+'%';
+      s.style.top = (Math.random()*100)+'%';
+      s.style.setProperty('--dur', (2.5 + Math.random()*4).toFixed(2)+'s');
+      s.style.setProperty('--minop', (Math.random()*.2).toFixed(2));
+      s.style.setProperty('--maxop', (0.5 + Math.random()*.5).toFixed(2));
+      wrap.appendChild(s);
+    }
+  }
+
+  function buildSvg(){
+    svg.innerHTML = '';
+
+    // gradient defs per category
+    const defs = el('defs', {});
+    Object.keys(CAT).forEach(key => {
+      const grad = el('radialGradient', {id:'grad-'+key, cx:'35%', cy:'32%', r:'75%'});
+      grad.appendChild(el('stop', {offset:'0%', 'stop-color':'#fff', 'stop-opacity':'.55'}));
+      grad.appendChild(el('stop', {offset:'35%', 'stop-color':CAT[key].hex, 'stop-opacity':'.9'}));
+      grad.appendChild(el('stop', {offset:'100%', 'stop-color':CAT[key].hex, 'stop-opacity':'.15'}));
+      defs.appendChild(grad);
+    });
+    svg.appendChild(defs);
+
+    const stagesThisPage = PAGES[pageIndex];
+
+    // path segments
+    for (let i=0;i<POS.length-1;i++){
+      const a = POS[i], b = POS[i+1];
+      const seg = el('path', {
+        d:`M${a.x},${a.y} L${b.x},${b.y}`,
+        class:'seg',
+        'data-seg':i
+      });
+      svg.appendChild(seg);
+    }
+
+    stagesThisPage.forEach((t, i) => {
+      const p = POS[i];
+      const cat = CAT[t.category];
+      const above = i % 2 === 0;
+
+      const g = el('g', {class:'node-group', 'data-i':i});
+
+      const dot = el('circle', {
+        cx:p.x, cy:p.y, r:16,
+        fill:`url(#grad-${t.category})`,
+        stroke:cat.hex, 'stroke-width':1,
+        class:'node-dot pending',
+        style:`--glow:${cat.hex}`,
+        'data-i':i
+      });
+      g.appendChild(dot);
+
+      const stemY1 = above ? p.y - 18 : p.y + 18;
+      const stemY2 = above ? p.y - 46 : p.y + 46;
+      const stem = el('line', {x1:p.x, y1:stemY1, x2:p.x, y2:stemY2, class:'node-stem'});
+      g.appendChild(stem);
+
+      const label = el('g', {class:'node-label'});
+      const textY = above ? stemY2 - 8 : stemY2 + 16;
+      const numText = el('text', {x:p.x, y:textY - 15, 'text-anchor':'middle', class:'num'});
+      numText.textContent = String(t.id).padStart(2,'0');
+      const nameText = el('text', {x:p.x, y:textY, 'text-anchor':'middle'});
+      nameText.textContent = t.name;
+      label.appendChild(numText);
+      label.appendChild(nameText);
+      g.appendChild(label);
+
+      g.addEventListener('click', () => {
+        if (i > revealUpTo) return;
+        setActive(i, false);
+      });
+      g.style.cursor = 'pointer';
+
+      svg.appendChild(g);
+    });
+
+    const comet = el('circle', {r:5, fill:'var(--amber)', class:'comet', id:'comet'});
+    svg.appendChild(comet);
+
+    const rocket = el('text', {x:POS[4].x+18, y:POS[4].y-18, class:'rocket-glyph', id:'rocketGlyph'});
+    rocket.textContent = '🚀';
+    svg.appendChild(rocket);
+  }
+
+  function renderDetail(i, animate){
+    const t = PAGES[pageIndex][i];
+    const cat = CAT[t.category];
+    detailWrap.innerHTML = `
+      <div class="entry-card">
+        <div class="card-inner${animate ? ' entering' : ''}" style="--cat-color:${cat.hex}">
+          <div class="glyph">${t.icon}</div>
+          <div>
+            <p class="card-index">Stage ${String(t.id).padStart(2,'0')} of ${total}</p>
+            <h2 class="card-title">${t.name}</h2>
+            <p class="card-tagline">"${t.tagline}"</p>
+          </div>
+          <div class="meta-row">
+            <div class="level">
+              <span class="level-cells">
+                ${[1,2,3].map(n => `<span class="level-cell${n <= t.level ? ' filled' : ''}"></span>`).join('')}
+              </span>
+              ${LEVEL_LABEL[t.level]}
+            </div>
+            <div class="category-tag"><span class="swatch" style="background:${cat.hex}"></span>${cat.label}</div>
+          </div>
+          <div class="why-box">
+            <p class="why-label">Why it matters</p>
+            <p class="why-text">${t.why}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function setActive(i, animate){
+    svg.querySelectorAll('.node-group').forEach(g => {
+      const idx = parseInt(g.dataset.i, 10);
+      const dot = g.querySelector('.node-dot');
+      const label = g.querySelector('.node-label');
+      if (idx <= revealUpTo){
+        dot.classList.remove('pending');
+        label.classList.add('shown');
+      } else {
+        dot.classList.add('pending');
+        label.classList.remove('shown');
+      }
+      dot.classList.toggle('active', idx === i);
+      dot.setAttribute('r', idx === i ? 18 : 14);
+    });
+    svg.querySelectorAll('.seg').forEach(s => {
+      const si = parseInt(s.dataset.seg, 10);
+      s.classList.toggle('lit', si < revealUpTo || (si === revealUpTo && i > si));
+    });
+    renderDetail(i, animate);
+    updateGlobalStep(i);
+  }
+
+  function updateGlobalStep(i){
+    const globalIdx = pageIndex*5 + i;
+    stepCount.innerHTML = '<b>' + String(globalIdx+1).padStart(2,'0') + '</b> / ' + total;
+    stepCount.classList.add('visible');
+    progressFill.style.width = (globalIdx/(total-1))*100 + '%';
+  }
+
+  function flyComet(fromI, toI, cb){
+    const comet = document.getElementById('comet');
+    const a = POS[fromI], b = POS[toI];
+    comet.classList.add('flying');
+    comet.setAttribute('cx', a.x);
+    comet.setAttribute('cy', a.y);
+    const seg = svg.querySelector(`.seg[data-seg="${Math.min(fromI,toI)}"]`);
+    const dur = 620;
+    const start = performance.now();
+    function step(now){
+      const p = Math.min(1, (now-start)/dur);
+      const ease = 1 - Math.pow(1-p, 3);
+      comet.setAttribute('cx', a.x + (b.x-a.x)*ease);
+      comet.setAttribute('cy', a.y + (b.y-a.y)*ease);
+      if (seg) seg.classList.add('lit');
+      if (p < 1){
+        requestAnimationFrame(step);
+      } else {
+        comet.classList.remove('flying');
+        cb && cb();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function goNext(){
+    if (!started) return;
+    const isLastNodeOfPage = revealUpTo === 4;
+    if (!isLastNodeOfPage){
+      const from = revealUpTo, to = revealUpTo + 1;
+      btnNext.disabled = true; btnPrev.disabled = true;
+      flyComet(from, to, () => {
+        revealUpTo = to;
+        setActive(to, true);
+        btnNext.disabled = false; btnPrev.disabled = false;
+        updateNavLabels();
+        const t = PAGES[pageIndex][to];
+        if (t.fun) setTimeout(() => showToast(t.fun), 300);
+      });
+      return;
+    }
+    // last node of this leg reached — either advance leg or finish
+    if (pageIndex < PAGES.length - 1){
+      goToPage(pageIndex + 1);
+    } else {
+      const rocket = document.getElementById('rocketGlyph');
+      rocket.classList.add('shown');
+      setTimeout(finishJourney, 700);
+    }
+  }
+
+  function goPrev(){
+    if (!started) return;
+    if (revealUpTo > 0){
+      const from = revealUpTo, to = revealUpTo - 1;
+      btnNext.disabled = true; btnPrev.disabled = true;
+      const seg = svg.querySelector(`.seg[data-seg="${to}"]`);
+      if (seg) seg.classList.remove('lit');
+      flyComet(from, to, () => {
+        revealUpTo = to;
+        setActive(to, true);
+        btnNext.disabled = false; btnPrev.disabled = false;
+        updateNavLabels();
+      });
+      return;
+    }
+    if (pageIndex > 0){
+      goToPage(pageIndex - 1, true);
+    }
+  }
+
+  function updateNavLabels(){
+    btnPrev.disabled = pageIndex === 0 && revealUpTo === 0;
+    const atLastOfPage = revealUpTo === 4;
+    if (atLastOfPage && pageIndex === PAGES.length - 1){
+      btnNext.textContent = 'Finish 🎯';
+    } else if (atLastOfPage){
+      btnNext.textContent = 'Next Leg →';
+    } else {
+      btnNext.textContent = 'Next →';
+    }
+  }
+
+  function goToPage(newPage, enterAtEnd){
+    constWrap.classList.add('turning');
+    setTimeout(() => {
+      pageIndex = newPage;
+      revealUpTo = enterAtEnd ? 4 : 0;
+      buildSvg();
+      pageNumEl.textContent = pageIndex + 1;
+      setActive(revealUpTo, true);
+      updateNavLabels();
+      constWrap.classList.remove('turning');
+    }, 220);
+  }
+
+  let toastTimer = null;
+  function showToast(msg){
+    clearTimeout(toastTimer);
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  function buildOverview(){
+    overviewGrid.innerHTML = '';
+    Object.keys(CAT).forEach(key => {
+      const cat = CAT[key];
+      const col = document.createElement('div');
+      col.className = 'overview-col';
+      const items = topics.filter(t => t.category === key);
+      col.innerHTML = `
+        <div class="overview-col-head"><span class="swatch" style="background:${cat.hex}"></span>${cat.label}</div>
+        <ul>${items.map((t,i) => `<li style="animation-delay:${i*70}ms">${t.name}</li>`).join('')}</ul>
+      `;
+      overviewGrid.appendChild(col);
+    });
+  }
+
+  function finishJourney(){
+    buildOverview();
+    showScreen('complete');
+  }
+
+  function startJourney(){
+    started = true;
+    pageIndex = 0;
+    revealUpTo = 0;
+    showScreen('journey');
+    document.getElementById('pageTotal').textContent = PAGES.length;
+    buildSvg();
+    setActive(0, true);
+    updateNavLabels();
+  }
+
+  function restartJourney(){
+    started = false;
+    pageIndex = 0;
+    revealUpTo = 0;
+    stepCount.classList.remove('visible');
+    showScreen('intro');
+  }
+
+  btnStart.addEventListener('click', startJourney);
+  btnNext.addEventListener('click', goNext);
+  btnPrev.addEventListener('click', goPrev);
+  btnRestart.addEventListener('click', restartJourney);
+
+  document.addEventListener('keydown', (e) => {
+    if (!screens.journey.classList.contains('active')) return;
+    if (e.key === 'ArrowRight') goNext();
+    if (e.key === 'ArrowLeft') goPrev();
+  });
+
+  makeStarfield();
+
+})();
+</script>
+
+</body>
+</html>
