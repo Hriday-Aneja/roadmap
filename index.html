@@ -37,7 +37,7 @@
     color:var(--ink);
     font-family:var(--mono);
     -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+    overflow:hidden;
     position:relative;
   }
 
@@ -86,7 +86,9 @@
   /* ---------- screens ---------- */
   #app{
     position:relative; z-index:2;
-    min-height:calc(100vh - 70px);
+    height:calc(100vh - 70px);
+    min-height:0;
+    overflow:hidden;
     display:flex;
     align-items:center;
     justify-content:center;
