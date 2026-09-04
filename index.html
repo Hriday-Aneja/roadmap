@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DSA Roadmap — SDC × GDG</title>
+<title>DSA Roadmap — SDC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -54,6 +54,31 @@
     z-index:0;
   }
 
+  .orbit-scene{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    perspective:900px; overflow:hidden;
+  }
+  .orbit-ring{
+    position:absolute; left:50%; top:42%; width:min(62vw,720px); aspect-ratio:1;
+    border:1px solid rgba(211,164,75,.12); border-radius:50%;
+    transform:translate(-50%,-50%) rotateX(68deg) rotateZ(-18deg);
+    animation:orbitSpin 24s linear infinite;
+    box-shadow:0 0 70px rgba(119,147,176,.06), inset 0 0 70px rgba(211,164,75,.04);
+  }
+  .orbit-ring::before,.orbit-ring::after{
+    content:""; position:absolute; border:1px solid rgba(142,173,148,.12);
+    border-radius:50%; inset:14%;
+  }
+  .orbit-ring::after{inset:32%; border-color:rgba(189,114,80,.16);}
+  .orbit-core{
+    position:absolute; left:50%; top:42%; width:10px; height:10px;
+    border-radius:50%; background:var(--amber); transform:translate(-50%,-50%);
+    box-shadow:0 0 18px 4px rgba(211,164,75,.38);
+    animation:corePulse 2.8s ease-in-out infinite;
+  }
+  @keyframes orbitSpin{to{transform:translate(-50%,-50%) rotateX(68deg) rotateZ(342deg);}}
+  @keyframes corePulse{50%{transform:translate(-50%,-50%) scale(1.55); opacity:.7;}}
+
   a,button{font-family:inherit;}
 
   /* ---------- top bar ---------- */
@@ -85,19 +110,23 @@
 
   /* ---------- screens ---------- */
   #app{
-    position:relative; z-index:2;
-    height:calc(100vh - 70px);
-    min-height:0;
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:10px clamp(16px,5vw,56px) 50px;
-  }
+  position:relative;
+  z-index:2;
+  height:calc(100dvh - 64px);
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px clamp(16px,4vw,50px) 12px;
+}
   .screen{
     display:none;
     width:100%;
     max-width:1080px;
+    transform:translateY(var(--fit-offset-y, 0px)) scale(var(--fit-scale, 1));
+    transform-origin:center center;
+    transition:opacity .35s var(--ease);
   }
   .screen.active{display:block;}
 
@@ -161,6 +190,9 @@
     color:var(--ink-faint);
   }
 
+  .screen.active{animation:screenIn .55s var(--ease) both;}
+  @keyframes screenIn{from{opacity:0;}to{opacity:1;}}
+
   /* ---------- journey progress bar ---------- */
   .progress-bar{
     position:relative;
@@ -187,13 +219,20 @@
 
   /* ---------- constellation ---------- */
   .constellation-wrap{
-    position:relative;
-    max-width:900px;
-    margin:0 auto;
-    transition:opacity .35s var(--ease), transform .35s var(--ease);
-  }
+  position:relative;
+  width:min(900px, 90vw);
+  max-height:300px;
+  margin:0 auto;
+  transition:opacity .35s var(--ease), transform .35s var(--ease);
+}
   .constellation-wrap.turning{opacity:0; transform:translateX(18px);}
-  svg#pathSvg{width:100%; height:auto; display:block; overflow:visible;}
+  svg#pathSvg{
+  width:100%;
+  height:auto;
+  max-height:300px;
+  display:block;
+  overflow:visible;
+}
 
   .seg{fill:none; stroke:var(--line); stroke-width:1.5; stroke-dasharray:2 7; stroke-linecap:round;}
   .seg.lit{stroke:var(--amber); opacity:.55; transition:stroke .5s var(--ease), opacity .5s var(--ease);}
@@ -228,10 +267,10 @@
 
   /* ---------- detail card ---------- */
   .detail-wrap{
-    max-width:640px;
-    margin:18px auto 0;
-    min-height:190px;
-  }
+  max-width:640px;
+  margin:10px auto 0;
+  min-height:170px;
+}
   .entry-card{
     border:1px solid var(--line); border-radius:4px;
     background:var(--panel-raised);
@@ -296,10 +335,13 @@
 
   /* ---------- nav ---------- */
   .nav-row{
-    display:flex; justify-content:center; align-items:center;
-    margin:22px auto 0; gap:14px;
-    max-width:640px;
-  }
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:12px auto 0;
+  gap:14px;
+  max-width:640px;
+}
   .nav-row .btn-ghost, .nav-row .btn-primary{flex:0 0 auto;}
 
   /* ---------- toast ---------- */
@@ -368,9 +410,10 @@
 <body>
 
 <div id="stars"></div>
+<div class="orbit-scene" aria-hidden="true"><div class="orbit-ring"></div><div class="orbit-core"></div></div>
 
 <header class="topbar">
-  <span class="wordmark">SDC × GDG — DSA Roadmap</span>
+  <span class="wordmark">SDC — DSA Roadmap</span>
   <span class="stepcount" id="stepCount"></span>
 </header>
 
@@ -378,7 +421,7 @@
 
   <!-- INTRO -->
   <section id="screen-intro" class="screen active">
-    <p class="kicker">A live session by SDC &amp; GDG</p>
+    <p class="kicker">A live session by SDC</p>
     <h1 class="hero-title">Your DSA journey<br>starts here 🚀</h1>
     <p class="hero-sub">$ ./start_journey.sh</p>
     <button id="btnStart" class="btn-primary">Start Journey →</button>
@@ -483,6 +526,7 @@
     journey: document.getElementById('screen-journey'),
     complete: document.getElementById('screen-complete')
   };
+  const app = document.getElementById('app');
   const stepCount = document.getElementById('stepCount');
   const svg = document.getElementById('pathSvg');
   const constWrap = document.getElementById('constWrap');
@@ -506,6 +550,30 @@
   function showScreen(name){
     Object.values(screens).forEach(s => s.classList.remove('active'));
     screens[name].classList.add('active');
+    fitActiveScreen();
+  }
+
+  function fitActiveScreen(){
+    const active = document.querySelector('.screen.active');
+    if (!active) return;
+    active.style.setProperty('--fit-scale', '1');
+    active.style.setProperty('--fit-offset-y', '0px');
+    requestAnimationFrame(() => {
+      const availableHeight = Math.max(1, app.clientHeight - 16);
+      const availableWidth = Math.max(1, app.clientWidth - 32);
+      const scale = Math.min(1, availableHeight / active.scrollHeight, availableWidth / active.scrollWidth);
+      active.style.setProperty('--fit-scale', scale.toFixed(4));
+      requestAnimationFrame(() => {
+        const appRect = app.getBoundingClientRect();
+        const screenRect = active.getBoundingClientRect();
+        const topLimit = appRect.top + 8;
+        const bottomLimit = appRect.bottom - 8;
+        const offset = screenRect.top < topLimit
+          ? topLimit - screenRect.top
+          : screenRect.bottom > bottomLimit ? bottomLimit - screenRect.bottom : 0;
+        active.style.setProperty('--fit-offset-y', offset.toFixed(1) + 'px');
+      });
+    });
   }
 
   function makeStarfield(){
@@ -630,6 +698,7 @@
         </div>
       </div>
     `;
+    fitActiveScreen();
   }
 
   function setActive(i, animate){
@@ -809,6 +878,7 @@
   btnNext.addEventListener('click', goNext);
   btnPrev.addEventListener('click', goPrev);
   btnRestart.addEventListener('click', restartJourney);
+  window.addEventListener('resize', fitActiveScreen);
 
   document.addEventListener('keydown', (e) => {
     if (!screens.journey.classList.contains('active')) return;
@@ -817,6 +887,7 @@
   });
 
   makeStarfield();
+  fitActiveScreen();
 
 })();
 </script>
